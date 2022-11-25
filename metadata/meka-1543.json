@@ -1,0 +1,51 @@
+{
+  "description": "Meka from the MekaVerse - A collection of 8,888 unique generative NFTs from an other universe. URI: https://ipfs.io/ipfs/Qmcob1MaPTXUZt5MztHEgsYhrf7R6G7wV8hpcweL8nEfgU/meka/1543",
+  "name": "Meka #1543",
+  "image": "https://ipfs.io/ipfs/QmPDA1iSjM3J1a8CG1CzXrRQj5tUjRAXHdJNKar6M1oEwy/white_white_darkgrey_darkgrey_bloodred_darkgrey_A_3A_1A_1A_4A_1A_1A_0_0_0_0_0_0_1835.png",
+  "attributes": [
+    {
+      "trait_type": "Color",
+      "value": "White"
+    },
+    {
+      "trait_type": "Color",
+      "value": "Dark Grey"
+    },
+    {
+      "trait_type": "Color",
+      "value": "Blood Red"
+    },
+    {
+      "trait_type": "Meka Type",
+      "value": "OG Meka"
+    },
+    {
+      "trait_type": "Helmet",
+      "value": "OG Radiant Trooper"
+    },
+    {
+      "trait_type": "Eyes",
+      "value": "OG Rose E1"
+    },
+    {
+      "trait_type": "Mask",
+      "value": "OG Trooper M1"
+    },
+    {
+      "trait_type": "Jaws",
+      "value": "OG Sabotage S3"
+    },
+    {
+      "trait_type": "Arms",
+      "value": "OG Trooper A1"
+    },
+    {
+      "trait_type": "Chest",
+      "value": "OG Trooper C1"
+    },
+    {
+      "trait_type": "Colors",
+      "value": 3
+    }
+  ]
+}
