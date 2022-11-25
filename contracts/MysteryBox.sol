@@ -71,6 +71,7 @@ contract MysteryBox is ERC721URIStorage, VRFConsumerBaseV2, Ownable {
         uint256 requestId,
         uint256[] memory randomWords
     ) internal override {
+        require(listNftURI.length > 0, "Need have nft uri");
         address sender = s_requestIdToSender[requestId];
 
         uint256 rnd = randomWords[0] % 100;
@@ -85,8 +86,7 @@ contract MysteryBox is ERC721URIStorage, VRFConsumerBaseV2, Ownable {
         }
         uint256 newTokenId = s_tokenCounter;
         _safeMint(sender, newTokenId);
-        uint256 index = randomWords[0] % (totalNft() - 1);
-        _setTokenURI(newTokenId, listNftURI[index]);
+        _setTokenURI(newTokenId, listNftURI[0]);
 
         s_tokenCounter += 1;
 
