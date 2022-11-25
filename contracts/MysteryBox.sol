@@ -16,7 +16,7 @@ contract MysteryBox is ERC721URIStorage, VRFConsumerBaseV2, Ownable {
     uint64 subId;
     address vrfCoordinatorAddress;
     bytes32 keyHash;
-    uint32 constant callbackGasLimit = 500000;
+    uint32 constant callbackGasLimit = 1000000;
     uint16 constant requestConfirmations = 3;
     uint32 constant numWords = 1;
 
