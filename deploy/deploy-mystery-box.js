@@ -22,8 +22,8 @@ module.exports = async function({ getNamedAccounts, deployments }) {
   }
 
   const args = [
-    vrfCoordinatorV2Address,
     subId,
+    vrfCoordinatorV2Address,
     keyHash,
     price,
   ]

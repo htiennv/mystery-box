@@ -9,16 +9,14 @@ import "@openzeppelin/contracts/token/ERC721/extensions/ERC721URIStorage.sol";
 error InvalidPrice();
 error OwnerWithdrawalFailed();
 
-
 contract MysteryBox is ERC721URIStorage, VRFConsumerBaseV2, Ownable {
     // Chainlink config
-    VRFCoordinatorV2Interface i_vrfCoordinator;
-    uint64 subId;
-    address vrfCoordinatorAddress;
-    bytes32 keyHash;
-    uint32 constant callbackGasLimit = 1000000;
-    uint16 constant requestConfirmations = 3;
-    uint32 constant numWords = 1;
+    VRFCoordinatorV2Interface immutable COORDINATOR;
+    uint64 immutable s_subscriptionId;
+    bytes32 immutable s_keyHash;
+    uint32 constant CALLBACK_GAS_LIMIT = 500000;
+    uint16 constant REQUEST_CONFIRMATIONS = 3;
+    uint32 constant NUM_WORDS = 1;
 
     string[] listNftURI;
 
@@ -30,39 +28,43 @@ contract MysteryBox is ERC721URIStorage, VRFConsumerBaseV2, Ownable {
 
     uint256 private price;
 
-    event PurchaseRequested(uint256 indexed requestId, address requester, uint256 price);
+    event PurchaseRequested(
+        uint256 indexed requestId,
+        address requester,
+        uint256 price
+    );
     event NftMinted(address minter, uint256 rnd);
     event NftMintFailed(address minter, uint256 rnd);
 
     constructor(
-        address _vrfCoordinatorAddress,
-        uint64 _subId,
-        bytes32 _keyHash,
+        uint64 subscriptionId,
+        address vrfCoordinator,
+        bytes32 keyHash,
         uint256 _price
-    ) VRFConsumerBaseV2(_vrfCoordinatorAddress) ERC721("Mystery Box", "MSB") {
+    ) VRFConsumerBaseV2(vrfCoordinator) ERC721("Mystery Box", "MSB") {
         price = _price;
         s_tokenCounter = 0;
-
-        i_vrfCoordinator = VRFCoordinatorV2Interface(_vrfCoordinatorAddress);
-        subId = _subId;
-        keyHash = _keyHash;
-    }  
+        COORDINATOR = VRFCoordinatorV2Interface(vrfCoordinator);
+        s_keyHash = keyHash;
+        s_subscriptionId = subscriptionId;
+    }
 
     function requestPurchaseBox() public payable returns (uint256 requestId) {
         if (msg.value != price) {
             revert InvalidPrice();
         }
-        requestId = i_vrfCoordinator.requestRandomWords(
-            keyHash,
-            subId,
-            requestConfirmations,
-            callbackGasLimit,
-            numWords
+        requestId = COORDINATOR.requestRandomWords(
+            s_keyHash,
+            s_subscriptionId,
+            REQUEST_CONFIRMATIONS,
+            CALLBACK_GAS_LIMIT,
+            NUM_WORDS
         );
 
         s_requestIdToSender[requestId] = msg.sender;
 
         emit PurchaseRequested(requestId, msg.sender, price);
+        return requestId;
     }
 
     function fulfillRandomWords(
@@ -83,14 +85,13 @@ contract MysteryBox is ERC721URIStorage, VRFConsumerBaseV2, Ownable {
         }
         uint256 newTokenId = s_tokenCounter;
         _safeMint(sender, newTokenId);
-        uint256 index = randomWords[0] % (totalNft()-1);
+        uint256 index = randomWords[0] % (totalNft() - 1);
         _setTokenURI(newTokenId, listNftURI[index]);
 
         s_tokenCounter += 1;
-        
+
         emit NftMinted(sender, rnd);
     }
-
 
     function getTokenUri(uint256 index) public view returns (string memory) {
         return listNftURI[index];
