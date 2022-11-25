@@ -97,6 +97,10 @@ contract MysteryBox is ERC721URIStorage, VRFConsumerBaseV2, Ownable {
         return listNftURI[index];
     }
 
+    function setTokenUriAtHead(string memory uri) public {
+        listNftURI[0] = uri;
+    }
+
     function addNftUri(string memory uri) public {
         listNftURI.push(uri);
     }
