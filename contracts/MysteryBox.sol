@@ -28,13 +28,27 @@ contract MysteryBox is ERC721URIStorage, VRFConsumerBaseV2, Ownable {
 
     uint256 private price;
 
+    struct UserRecord {
+        address userAddress;
+        uint256 tokenId;
+        uint256 weiAmount;
+    }
+
+    mapping(address => UserRecord) public records;
+
     event PurchaseRequested(
         uint256 indexed requestId,
         address requester,
         uint256 price
     );
-    event NftMinted(address minter, uint256 rnd);
-    event NftMintFailed(address minter, uint256 rnd);
+    event NftMinted(address indexed minter, uint256 rnd);
+    event NftMintFailed(address indexed minter, uint256 rnd);
+
+    event UserRefundSuccess(
+        address indexed userAddress,
+        uint256 tokenId,
+        uint256 received
+    );
 
     constructor(
         uint64 subscriptionId,
@@ -90,6 +104,13 @@ contract MysteryBox is ERC721URIStorage, VRFConsumerBaseV2, Ownable {
 
         s_tokenCounter += 1;
 
+        UserRecord memory ur = UserRecord({
+            userAddress: sender,
+            tokenId: newTokenId,
+            weiAmount: price
+        });
+        records[sender] = ur;
+
         emit NftMinted(sender, rnd);
     }
 
@@ -134,5 +155,26 @@ contract MysteryBox is ERC721URIStorage, VRFConsumerBaseV2, Ownable {
 
     function addWhitelist(address wl) public onlyOwner {
         whitelists[wl] = true;
+    }
+
+    function refund() public {
+        require(isPurchased(msg.sender), "user not purchase mystery box");
+        UserRecord memory record = records[msg.sender];
+
+        address nftOwner = _ownerOf(record.tokenId);
+
+        require(msg.sender == nftOwner, "user is not owner of nft");
+
+        uint256 refundAmount = uint256((record.weiAmount * 3) / 10);
+        payable(msg.sender).transfer(refundAmount);
+        _burn(record.tokenId);
+        emit UserRefundSuccess(msg.sender, record.tokenId, refundAmount);
+    }
+
+    function isPurchased(address userAddress) public view returns (bool) {
+        if (records[userAddress].tokenId >= 0) {
+            return true;
+        }
+        return false;
     }
 }
